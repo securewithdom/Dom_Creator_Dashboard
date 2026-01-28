@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Dom Creator Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analytics-container {
+        padding: 2rem 1rem;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .platform-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-top: 5px solid;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .platform-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .platform-card.tiktok {
+        border-top-color: #000000;
+    }
+
+    .platform-card.youtube {
+        border-top-color: #FF0000;
+    }
+
+    .platform-card.instagram {
+        border-top-color: #E1306C;
+    }
+
+    .platform-card.facebook {
+        border-top-color: #1877F2;
+    }
+
+    .platform-card.linkedin {
+        border-top-color: #0A66C2;
+    }
+
+    .platform-card.threads {
+        border-top-color: #333333;
+    }
+
+    .platform-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .metric-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .metric-row:last-child {
+        border-bottom: none;
+    }
+
+    .metric-label {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .metric-value {
+        font-weight: 700;
+        color: #333;
+        font-size: 1.1rem;
+    }
+
+    .top-posts {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid #f0f0f0;
+    }
+
+    .top-posts-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    .post-item-analytics {
+        padding: 0.75rem;
+        background: #f9f9f9;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+
+    .post-engagement {
+        font-weight: 600;
+        color: #007bff;
+    }
+
+    .refresh-note {
+        text-align: center;
+        padding: 1rem;
+        background: #e7f3ff;
+        border-radius: 4px;
+        color: #0066cc;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+    }
+
+    .api-placeholder {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 4px;
+        padding: 0.75rem;
+        margin-top: 1rem;
+        font-size: 0.85rem;
+        color: #856404;
+    }
+
+    .api-placeholder strong {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .scheduled-badge {
+        display: inline-block;
+        background: #cfe2ff;
+        color: #084298;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .analytics-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .platform-card {
+            padding: 1rem;
+        }
+
+        .platform-name {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="analytics-container">
+    <h2>📊 Analytics Dashboard</h2>
+
+    <div class="refresh-note">
+        ℹ️ Data is currently mocked for UI development. Real API integrations will show live metrics.
+    </div>
+
+    <div class="analytics-grid">
+        {% for platform_key, data in analytics.items() %}
+        <div class="platform-card {{ platform_key }}">
+            <div class="platform-name">
+                {% if platform_key == 'tiktok' %}
+                    🎵
+                {% elif platform_key == 'youtube' %}
+                    ▶️
+                {% elif platform_key == 'instagram' %}
+                    📷
+                {% elif platform_key == 'facebook' %}
+                    👥
+                {% elif platform_key == 'linkedin' %}
+                    💼
+                {% elif platform_key == 'threads' %}
+                    💬
+                {% endif %}
+                {{ data.name }}
+            </div>
+
+            <div class="metric-row">
+                <span class="metric-label">Followers</span>
+                <span class="metric-value">{{ "{:,}".format(data.followers) }}</span>
+            </div>
+
+            <div class="metric-row">
+                <span class="metric-label">Views (7d)</span>
+                <span class="metric-value">{{ "{:,}".format(data.views_7d) }}</span>
+            </div>
+
+            <div class="metric-row">
+                <span class="metric-label">Posts Scheduled</span>
+                <span class="metric-value"><span class="scheduled-badge">{{ data.posts_scheduled }}</span></span>
+            </div>
+
+            <div class="top-posts">
+                <div class="top-posts-title">Top 3 Posts</div>
+                {% for post in data.top_posts %}
+                <div class="post-item-analytics">
+                    <span>{{ post.title }}</span>
+                    <span class="post-engagement">{{ "{:,}".format(post.engagement) }} eng.</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- API Integration Placeholder -->
+            <div class="api-placeholder">
+                <strong>🔌 API Integration</strong>
+                The code is ready to swap this mocked data with real {{ data.name }} API calls.
+                See <code>app.py</code> for the <code>get_analytics_data()</code> function.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Additional Notes Section -->
+    <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); margin-top: 2rem;">
+        <h3>📝 Integration Notes</h3>
+        <p><strong>Current State:</strong> All data is mocked for UI/UX development.</p>
+        <p><strong>To Add Real APIs:</strong></p>
+        <ol>
+            <li>Get API keys from each platform and store in environment variables</li>
+            <li>In <code>app.py</code>, replace the <code>get_analytics_data()</code> function calls with real API requests</li>
+            <li>Implement caching to avoid rate limits (Redis or simple in-memory cache)</li>
+            <li>Consider implementing platform-specific helper modules (e.g., <code>utils/tiktok_api.py</code>)</li>
+        </ol>
+        <p><strong>Platform API Resources:</strong></p>
+        <ul>
+            <li>TikTok: <a href="https://developers.tiktok.com" target="_blank">TikTok Developer</a></li>
+            <li>YouTube: <a href="https://developers.google.com/youtube/v3" target="_blank">YouTube Data API v3</a></li>
+            <li>Instagram/Facebook: <a href="https://developers.facebook.com" target="_blank">Meta Graph API</a></li>
+            <li>LinkedIn: <a href="https://www.linkedin.com/developers" target="_blank">LinkedIn API</a></li>
+            <li>Threads: API availability pending</li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Placeholder for future analytics refresh functionality
+    console.log('Analytics page loaded. When real APIs are integrated, add auto-refresh here.');
+</script>
+{% endblock %}

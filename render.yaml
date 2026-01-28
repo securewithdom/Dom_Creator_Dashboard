@@ -1,0 +1,45 @@
+services:
+  # Primary web service
+  - type: web
+    name: dom-creator-dashboard
+    env: python
+    region: oregon
+    plan: free
+    runtime:
+      type: python
+      version: 3.11
+
+    # Build command
+    buildCommand: pip install -r requirements.txt && flask db upgrade
+
+    # Start command
+    startCommand: gunicorn app:app
+
+    # Environment variables
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        # IMPORTANT: Generate a secure key before deploying!
+        # Run: python -c "import secrets; print(secrets.token_hex(32))"
+        fromDatabase:
+          name: secret-key
+          property: SECRET_KEY
+      - key: DATABASE_URL
+        fromDatabase:
+          name: postgresql
+          property: DATABASE_URL
+
+  # PostgreSQL database (free tier available)
+  - type: pserv
+    name: postgresql
+    env: postgres
+    plan: free
+    region: oregon
+    ipAllowList: [] # Allow all IPs
+
+# Cleanup/housekeeping
+# To use this in Render:
+# 1. Ensure you have a PostgreSQL database provisioned (or use SQLite for testing)
+# 2. Set the SECRET_KEY environment variable in Render dashboard
+# 3. Push to GitHub and connect the repo to Render for auto-deployment
